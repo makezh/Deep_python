@@ -4,7 +4,6 @@ from unittest.mock import patch
 from main import CustomList, main
 
 
-
 class MyTestCase(unittest.TestCase):
 
     def test_print(self):
@@ -41,7 +40,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(simple_list - list_1, CustomList([-4, 1, 0, -7]))
         self.assertEqual(simple_list + list_1, CustomList([6, 3, 6, 7]))
 
-    def test_main(self):
+    @patch('builtins.print')
+    def test_main(self, mock_print):
         with patch('main.__name__', '__main__'):
             self.assertEqual(main(), 'end of main')
         with patch('main.__name__', '__not_main__'):
