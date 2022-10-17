@@ -1,5 +1,4 @@
 class LRUCache:
-
     def __init__(self, limit=42):
         self.limit = limit
         self.cache = {}
@@ -25,7 +24,7 @@ class LRUCache:
 
 
 def main():
-    if __name__ == '__main__':
+    if __name__ == "__main__":
         cache = LRUCache(2)
 
         cache.set("k1", "val1")
