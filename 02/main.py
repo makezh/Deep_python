@@ -21,8 +21,8 @@ def parse_json(json_str: str,
     triggers = 0  # количество найденных слов
     results = []
 
-    for value in json_doc:
-        if value in required_fields:
+    for value in required_fields:
+        if value in json_doc:
             for word in json_doc[value]:
                 if word in keywords:
                     results.append(keyword_callback(word))
