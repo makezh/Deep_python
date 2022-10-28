@@ -1,8 +1,10 @@
+import json
 import sys
 import unittest
 from unittest.mock import patch
 
 from client import process_file, check_argv
+from server import common_words, create_parser
 
 
 class MyTestCase(unittest.TestCase):
@@ -31,7 +33,27 @@ class MyTestCase(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 check_argv()
 
+    def test_common_words_by_server(self):
+        test_url = 'https://habr.com/ru/company/vk/blog/'
+        expected_dict = {"https://habr.com/ru/company/vk/blog/":
+                             {"всего": 20,
+                              "голосов": 20,
+                              "просмотры": 20,
+                              "добавить": 20,
+                              "закладки": 20}
+                         }
+        expected_json = json.dumps(expected_dict, ensure_ascii=False)
+        self.assertEqual(common_words(test_url, 5), expected_json)
+        test_json = json.dumps(expected_dict, ensure_ascii=False)
+        print(test_json)
 
+    def test_parser_argv_by_server(self):
+        with patch("sys.argv", ["server.py", '-w', '241', '-k', '34']):
+            parser = create_parser()
+            namespace = parser.parse_args(sys.argv[1:])
+            workers, top_k = namespace.workers, namespace.top_k
+            self.assertEqual(workers, 241)
+            self.assertEqual(top_k, 34)
 
 
 if __name__ == '__main__':
