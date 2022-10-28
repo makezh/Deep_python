@@ -6,9 +6,13 @@ import threading
 
 # CONSTANTS
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 5555
-ADDR = (IP, PORT)
+PORT_R = 5555
+PORT_S = 6666
+ADDR_R = (IP, PORT_R)
+ADDR_S = (IP, PORT_S)
 FORMAT = 'utf-8'
+SIZE = 1024
+END_QUE = '>END'
 
 
 def check_argv():
@@ -30,33 +34,46 @@ def check_argv():
         )
 
 
-def batch_file(file: str, workers: int):
+def process_file(file: str):
+    urls = queue.Queue()
     with open(file, 'r') as f:
-        length = len(f.readlines())
-    return length // workers
-
-
-def process_file(file: str, thread: int, for_one: int):
-    urls = queue.Queue(for_one)
-    with open(file, 'r') as f:
-        for i, line in enumerate(f):
-            for url in range(for_one):
-                if i == (thread * for_one + url):
-                    urls.put(line.strip())
+        for line in f:
+            urls.put(line.strip())
+        urls.put(END_QUE)
     return urls
+
+
+def client_connect(ADDR1, ADDR2):
+    socket_1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    socket_1.connect(ADDR1)
+    socket_2.connect(ADDR2)
+    return socket_1, socket_2
+
+
+def client_request(sock_rec, sock_send, que):
+    # отправляем url из очереди
+    sock_send.sendall(que.get().encode(FORMAT))
+
+    # принимаем ответ с сервера
+    print(sock_rec.recv(SIZE).decode(FORMAT))
 
 
 def main():
     check_argv()
     N_THREADS = int(sys.argv[1])
     FILE = sys.argv[2]
-    for_one = batch_file(FILE, N_THREADS)
+
+    sock_rec, sock_send = client_connect(ADDR_R, ADDR_S)
+    urls_que = process_file(FILE)
+
     threads = [
         threading.Thread(
-            target=process_file,
-            args=(FILE, thread, for_one),
+            target=client_request,
+            args=(sock_rec, sock_send, urls_que),
         )
-        for thread in range(N_THREADS)
+        for _ in range(N_THREADS)
     ]
 
     for th in threads:
@@ -65,8 +82,8 @@ def main():
     for th in threads:
         th.join()
 
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(ADDR)
+    sock_rec.close()
+    sock_send.close()
 
 
 if __name__ == '__main__':
