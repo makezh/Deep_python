@@ -44,8 +44,6 @@ class MyTestCase(unittest.TestCase):
                          }
         expected_json = json.dumps(expected_dict, ensure_ascii=False)
         self.assertEqual(common_words(test_url, 5), expected_json)
-        test_json = json.dumps(expected_dict, ensure_ascii=False)
-        print(test_json)
 
     def test_parser_argv_by_server(self):
         with patch("sys.argv", ["server.py", '-w', '241', '-k', '34']):
