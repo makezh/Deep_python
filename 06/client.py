@@ -6,10 +6,8 @@ import threading
 
 # CONSTANTS
 IP = socket.gethostbyname(socket.gethostname())
-PORT_R = 5555
-PORT_S = 6666
-ADDR_R = (IP, PORT_R)
-ADDR_S = (IP, PORT_S)
+PORT = 6666
+ADDR = (IP, PORT)
 FORMAT = 'utf-8'
 SIZE = 1024
 END_QUE = '>END'
@@ -38,26 +36,26 @@ def process_file(file: str):
     urls = queue.Queue()
     with open(file, 'r') as f:
         for line in f:
-            urls.put(line.strip())
+            urls.put(line.strip('\n'))
+            print('TEST', line.strip('\n'))
         urls.put(END_QUE)
     return urls
 
 
-def client_connect(ADDR1, ADDR2):
-    socket_1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket_2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    socket_1.connect(ADDR1)
-    socket_2.connect(ADDR2)
-    return socket_1, socket_2
+def client_connect(addr):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect(addr)
+    return sock
 
 
-def client_request(sock_rec, sock_send, que):
-    # отправляем url из очереди
-    sock_send.sendall(que.get().encode(FORMAT))
+def client_request(sock: socket.socket, que: queue.Queue):
+    while que.qsize() > 0:
+        # отправляем url из очереди
+        data = que.get().encode(FORMAT)
+        sock.sendall(data)
 
-    # принимаем ответ с сервера
-    print(sock_rec.recv(SIZE).decode(FORMAT))
+        # принимаем ответ с сервера
+        print(sock.recv(SIZE).decode(FORMAT))
 
 
 def main():
@@ -65,13 +63,13 @@ def main():
     N_THREADS = int(sys.argv[1])
     FILE = sys.argv[2]
 
-    sock_rec, sock_send = client_connect(ADDR_R, ADDR_S)
+    sock = client_connect(ADDR)
     urls_que = process_file(FILE)
 
     threads = [
         threading.Thread(
             target=client_request,
-            args=(sock_rec, sock_send, urls_que),
+            args=(sock, urls_que),
         )
         for _ in range(N_THREADS)
     ]
@@ -82,8 +80,7 @@ def main():
     for th in threads:
         th.join()
 
-    sock_rec.close()
-    sock_send.close()
+    sock.close()
 
 
 if __name__ == '__main__':
