@@ -60,22 +60,23 @@ def get_urls(conn, que):
     while True:
         url = conn.recv(SIZE).decode(FORMAT)
         if url == END_QUE:
-            print("END OF PARSE")
             break
         if url:
             que.put(url)
 
 
-def process_urls(conn: socket.socket, lock: threading.Lock, que: queue.Queue, top_k: int, count: int):
+def process_urls(conn: socket.socket, lock: threading.Lock, que: queue.Queue, top_k: int, count: [int]):
     while True:
         url = que.get()
         if url == END_QUE:
             que.put(END_QUE)
+            print("END OF PARSE")
+            conn.close()
             break
         url_json = common_words(url, top_k)
         conn.send(url_json.encode(FORMAT))
         with lock:
-            count += 1
+            count[0] += 1
             print(count, "ссылок обработано")
 
 
