@@ -5,10 +5,10 @@ import sys
 import argparse
 from queue import Queue
 
-import requests
-from bs4 import BeautifulSoup
 import socket
 import threading
+import requests
+from bs4 import BeautifulSoup
 
 # CONSTANTS
 IP = socket.gethostbyname(socket.gethostname())
@@ -27,7 +27,7 @@ def create_parser():
     return arg_parser
 
 
-def server_connect(addr):
+def server_connect(addr: tuple[str, int]):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(addr)
     sock.listen()
@@ -38,7 +38,9 @@ def common_words(url: str, count_words: int):
     word_count = Counter()
     try:
         request = requests.get(url, timeout=3)
-    except requests.ConnectionError or requests.exceptions.MissingSchema or requests.exceptions.ReadTimeout:
+    except (requests.ConnectionError,
+            requests.exceptions.MissingSchema,
+            requests.exceptions.ReadTimeout):
         res_json = json.dumps({url: 'error'}, ensure_ascii=False)
     else:
         soup = BeautifulSoup(request.text, 'html.parser')
@@ -56,7 +58,7 @@ def common_words(url: str, count_words: int):
     return res_json
 
 
-def get_urls(conn, que):
+def get_urls(conn: socket.socket, que: queue.Queue):
     while True:
         url = conn.recv(SIZE).decode(FORMAT)
         if url:
@@ -65,7 +67,11 @@ def get_urls(conn, que):
             break
 
 
-def process_urls(conn: socket.socket, lock: threading.Lock, que: queue.Queue, top_k: int, count: [int]):
+def process_urls(conn: socket.socket,
+                 lock: threading.Lock,
+                 que: queue.Queue,
+                 top_k: int,
+                 count: [int]):
     while True:
         url = que.get()
         if url == END_QUE:
@@ -97,11 +103,11 @@ def main():
         threading.Thread(target=get_urls, args=(conn, que))
     )
 
-    for th in threads:
-        th.start()
+    for thread in threads:
+        thread.start()
 
-    for th in threads:
-        th.join()
+    for thread in threads:
+        thread.join()
 
     print("END OF PARSE")
 

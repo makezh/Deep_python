@@ -34,20 +34,21 @@ def check_argv():
 
 def process_file(file: str):
     urls = queue.Queue()
-    with open(file, 'r') as f:
-        for line in f:
-            urls.put(line.strip('\n'))
+    with open(file, 'r', encoding=FORMAT) as file_urls:
+        for line in file_urls:
+            urls.put(line.strip())
         urls.put(END_QUE)
     return urls
 
 
-def client_connect(addr):
+def client_connect(addr: tuple[str, int]):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(addr)
     return sock
 
 
-def client_request(sock: socket.socket, que: queue.Queue):
+def client_request(sock: socket.socket,
+                   que: queue.Queue):
     while que.qsize() > 0:
         # отправляем url из очереди
         data = que.get().encode(FORMAT)
@@ -59,25 +60,25 @@ def client_request(sock: socket.socket, que: queue.Queue):
 
 def main():
     check_argv()
-    N_THREADS = int(sys.argv[1])
-    FILE = sys.argv[2]
+    n_threads = int(sys.argv[1])
+    file = sys.argv[2]
 
     sock = client_connect(ADDR)
-    urls_que = process_file(FILE)
+    urls_que = process_file(file)
 
     threads = [
         threading.Thread(
             target=client_request,
             args=(sock, urls_que),
         )
-        for _ in range(N_THREADS)
+        for _ in range(n_threads)
     ]
 
-    for th in threads:
-        th.start()
+    for thread in threads:
+        thread.start()
 
-    for th in threads:
-        th.join()
+    for thread in threads:
+        thread.join()
 
     sock.close()
 
