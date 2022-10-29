@@ -12,11 +12,12 @@ from bs4 import BeautifulSoup
 
 # CONSTANTS
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 6666
+PORT = 5555
 ADDR = (IP, PORT)
 FORMAT = 'utf-8'
 SIZE = 1024
 END_QUE = '>END'
+SPLIT_CHAR = '†'
 
 
 def create_parser():
@@ -60,11 +61,12 @@ def common_words(url: str, count_words: int):
 
 def get_urls(conn: socket.socket, que: queue.Queue):
     while True:
-        url = conn.recv(SIZE).decode(FORMAT)
-        if url:
-            que.put(url)
-        if url == END_QUE:
-            break
+        urls = conn.recv(SIZE).decode(FORMAT).split(SPLIT_CHAR)
+        for url in urls:
+            if url:
+                que.put(url)
+            if url == END_QUE:
+                return
 
 
 def process_urls(conn: socket.socket,
@@ -93,7 +95,7 @@ def main():
     conn, _ = server.accept()
     lock = threading.Lock()
     que = Queue()
-    count = [1]
+    count = [0]
     threads = [
         threading.Thread(target=process_urls, args=(conn, lock, que, top_k, count))
         for _ in range(workers)
@@ -109,7 +111,7 @@ def main():
     for thread in threads:
         thread.join()
 
-    print("END OF PARSE")
+    print(">>>THE END<<<")
 
     server.close()
 

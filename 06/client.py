@@ -6,11 +6,12 @@ import threading
 
 # CONSTANTS
 IP = socket.gethostbyname(socket.gethostname())
-PORT = 6666
+PORT = 5555
 ADDR = (IP, PORT)
 FORMAT = 'utf-8'
 SIZE = 1024
 END_QUE = '>END'
+SPLIT_CHAR = '†'
 
 
 def check_argv():
@@ -36,7 +37,7 @@ def process_file(file: str):
     urls = queue.Queue()
     with open(file, 'r', encoding=FORMAT) as file_urls:
         for line in file_urls:
-            urls.put(line.strip())
+            urls.put(line.strip() + SPLIT_CHAR)
         urls.put(END_QUE)
     return urls
 
@@ -79,6 +80,8 @@ def main():
 
     for thread in threads:
         thread.join()
+
+    print(">>>THE END<<<")
 
     sock.close()
 
