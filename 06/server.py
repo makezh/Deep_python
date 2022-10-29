@@ -59,10 +59,10 @@ def common_words(url: str, count_words: int):
 def get_urls(conn, que):
     while True:
         url = conn.recv(SIZE).decode(FORMAT)
-        if url == END_QUE:
-            break
         if url:
             que.put(url)
+        if url == END_QUE:
+            break
 
 
 def process_urls(conn: socket.socket, lock: threading.Lock, que: queue.Queue, top_k: int, count: [int]):
@@ -70,14 +70,12 @@ def process_urls(conn: socket.socket, lock: threading.Lock, que: queue.Queue, to
         url = que.get()
         if url == END_QUE:
             que.put(END_QUE)
-            print("END OF PARSE")
-            conn.close()
             break
         url_json = common_words(url, top_k)
         conn.send(url_json.encode(FORMAT))
         with lock:
             count[0] += 1
-            print(count, "ссылок обработано")
+            print(count[0], "ссылок обработано")
 
 
 def main():
@@ -89,7 +87,7 @@ def main():
     conn, _ = server.accept()
     lock = threading.Lock()
     que = Queue()
-    count = [0]
+    count = [1]
     threads = [
         threading.Thread(target=process_urls, args=(conn, lock, que, top_k, count))
         for _ in range(workers)
@@ -104,6 +102,8 @@ def main():
 
     for th in threads:
         th.join()
+
+    print("END OF PARSE")
 
     server.close()
 

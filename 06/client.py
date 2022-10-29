@@ -37,7 +37,6 @@ def process_file(file: str):
     with open(file, 'r') as f:
         for line in f:
             urls.put(line.strip('\n'))
-            print('TEST', line.strip('\n'))
         urls.put(END_QUE)
     return urls
 
