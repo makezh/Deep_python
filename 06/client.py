@@ -22,10 +22,10 @@ def check_argv():
 
     try:
         int(sys.argv[1])
-    except ValueError:
+    except ValueError as v_err:
         raise ValueError(
             "1st argument should be INTEGER"
-        )
+        ) from v_err
 
     if not (os.path.exists(sys.argv[2])):
         raise FileNotFoundError(
@@ -60,31 +60,33 @@ def client_request(sock: socket.socket,
 
 
 def main():
-    check_argv()
-    n_threads = int(sys.argv[1])
-    file = sys.argv[2]
+    if __name__ == '__main__':
+        check_argv()
+        n_threads = int(sys.argv[1])
+        file = sys.argv[2]
 
-    sock = client_connect(ADDR)
-    urls_que = process_file(file)
+        sock = client_connect(ADDR)
+        urls_que = process_file(file)
 
-    threads = [
-        threading.Thread(
-            target=client_request,
-            args=(sock, urls_que),
-        )
-        for _ in range(n_threads)
-    ]
+        threads = [
+            threading.Thread(
+                target=client_request,
+                args=(sock, urls_que),
+            )
+            for _ in range(n_threads)
+        ]
 
-    for thread in threads:
-        thread.start()
+        for thread in threads:
+            thread.start()
 
-    for thread in threads:
-        thread.join()
+        for thread in threads:
+            thread.join()
 
-    print(">>>THE END<<<")
+        print(">>>THE END<<<")
 
-    sock.close()
+        sock.close()
+        return "end of main in client"
+    return "just end of client"
 
 
-if __name__ == '__main__':
-    main()
+main()

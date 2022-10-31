@@ -87,34 +87,36 @@ def process_urls(conn: socket.socket,
 
 
 def main():
-    parser = create_parser()
-    namespace = parser.parse_args(sys.argv[1:])
-    workers, top_k = namespace.workers, namespace.top_k
-    server = server_connect(ADDR)
+    if __name__ == '__main__':
+        parser = create_parser()
+        namespace = parser.parse_args(sys.argv[1:])
+        workers, top_k = namespace.workers, namespace.top_k
+        server = server_connect(ADDR)
 
-    conn, _ = server.accept()
-    lock = threading.Lock()
-    que = Queue()
-    count = [0]
-    threads = [
-        threading.Thread(target=process_urls, args=(conn, lock, que, top_k, count))
-        for _ in range(workers)
-    ]
+        conn, _ = server.accept()
+        lock = threading.Lock()
+        que = Queue()
+        count = [0]
+        threads = [
+            threading.Thread(target=process_urls, args=(conn, lock, que, top_k, count))
+            for _ in range(workers)
+        ]
 
-    threads.append(
-        threading.Thread(target=get_urls, args=(conn, que))
-    )
+        threads.append(
+            threading.Thread(target=get_urls, args=(conn, que))
+        )
 
-    for thread in threads:
-        thread.start()
+        for thread in threads:
+            thread.start()
 
-    for thread in threads:
-        thread.join()
+        for thread in threads:
+            thread.join()
 
-    print(">>>THE END<<<")
+        print(">>>THE END<<<")
 
-    server.close()
+        server.close()
+        return "end of main in server"
+    return "just end of server"
 
 
-if __name__ == '__main__':
-    main()
+main()
