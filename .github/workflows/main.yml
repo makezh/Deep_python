@@ -1,0 +1,32 @@
+name: CI
+
+on: [push]
+
+jobs:
+  run_tests:
+    runs-on: [ubuntu-latest]
+    steps:
+      # Чекаутим код
+      - uses: actions/checkout@master
+      # Устанавливаем python нужной версии
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+      - name: Install requirements
+        # Устанавливаем зависимости
+        run: |
+          pip install cffi
+          pip install pylint
+          pip install flake8
+          pip install coverage
+      - name: Run tests
+        run: coverage run 07/tests.ppy
+      - name: Tests report
+        run: coverage report
+      - name: Create .so and run perf
+        run: |
+          cd 07/cffi
+          gcc -fPIC -shared -o libchain.so main.c
+          cd ..
+          python perf.py
