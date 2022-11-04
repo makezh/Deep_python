@@ -26,7 +26,7 @@ def main():
         start_cffi = time.time()
         cffi_lib.chain_multiply(NUM_MATRICES, DIM_MATRICES)
         end_cffi = time.time()
-        print(f"Time of execution of cffi fibonacci implementation is {end_cffi - start_cffi} seconds")
+        print(f"Time of execution of cffi matmul implementation is {end_cffi - start_cffi} seconds")
 
 
 main()
