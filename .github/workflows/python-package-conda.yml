@@ -30,6 +30,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: add libchain.so and run perf
       run: |
+        cd 07
         cd cffi
         gcc -fPIC -shared -o libchain.so main.c
         cd ..
