@@ -6,7 +6,8 @@ from CustomList import CustomList, main
 
 
 def list_comparison(list_1, list_2) -> bool:
-    return functools.reduce(lambda x, y: x and y, map(lambda p, q: p == q, list_1, list_2), True)
+    return functools.reduce(lambda x, y: x and y,
+                            map(lambda p, q: p == q, list_1, list_2), True)
 
 
 class MyTestCase(unittest.TestCase):
