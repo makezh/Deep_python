@@ -2,11 +2,6 @@ from itertools import zip_longest
 
 
 class CustomList(list):
-    def __init__(self, *args):
-        if len(args) == 0:
-            super().__init__([])
-        else:
-            super().__init__(args[0])
 
     def __add__(self, other):
         return CustomList([sum(i) for i in zip_longest(self,

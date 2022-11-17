@@ -6,8 +6,12 @@ from CustomList import CustomList, main
 
 
 def list_comparison(list_1, list_2) -> bool:
-    return functools.reduce(lambda x, y: x and y,
-                            map(lambda p, q: p == q, list_1, list_2), True)
+    return len(list_1) == len(list_2) and \
+           functools.reduce(
+               lambda x, y: x and y,
+               map(lambda p, q: p == q, list_1, list_2),
+               True
+           )
 
 
 class MyTestCase(unittest.TestCase):
@@ -41,15 +45,37 @@ class MyTestCase(unittest.TestCase):
         list_1 = CustomList(init_list_1)
         list_2 = CustomList(init_list_2)
 
-        # сложение
+        # сложение 1 + 2
         self.assertTrue(list_comparison(list_1 + list_2,
                                         CustomList([6, 3, 10, 7])))
+
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(list_1,
+                                        CustomList(init_list_1)))
+        self.assertTrue(list_comparison(list_2,
+                                        CustomList(init_list_2)))
+
+        # сложение 2 + 1
         self.assertTrue(list_comparison(list_2 + list_1,
                                         CustomList([6, 3, 10, 7])))
 
-        # вычитание
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(list_1,
+                                        CustomList(init_list_1)))
+        self.assertTrue(list_comparison(list_2,
+                                        CustomList(init_list_2)))
+
+        # вычитание 1 - 2
         self.assertTrue(list_comparison(list_1 - list_2,
                                         CustomList([4, -1, -4, 7])))
+
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(list_1,
+                                        CustomList(init_list_1)))
+        self.assertTrue(list_comparison(list_2,
+                                        CustomList(init_list_2)))
+
+        # вычитание 2 - 1
         self.assertTrue(list_comparison(list_2 - list_1,
                                         CustomList([-4, 1, 4, -7])))
 
@@ -64,15 +90,31 @@ class MyTestCase(unittest.TestCase):
         custom_list = CustomList(init_list)
         simple_list = [5, 1, 18]
 
-        # сложение
+        # сложение custom + simple
         self.assertTrue(list_comparison(custom_list + simple_list,
                                         CustomList([11, 3, 22, 3])))
+
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(custom_list, init_list))
+        self.assertTrue(list_comparison(simple_list, [5, 1, 18]))
+
+        # сложение simple + custom
         self.assertTrue(list_comparison(simple_list + custom_list,
                                         CustomList([11, 3, 22, 3])))
 
-        # вычитание
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(custom_list, init_list))
+        self.assertTrue(list_comparison(simple_list, [5, 1, 18]))
+
+        # вычитание custom - simple
         self.assertTrue(list_comparison(custom_list - simple_list,
                                         CustomList([1, 1, -14, 3])))
+
+        # проверка на неизменяемость
+        self.assertTrue(list_comparison(custom_list, init_list))
+        self.assertTrue(list_comparison(simple_list, [5, 1, 18]))
+
+        # вычитание simple - custom
         self.assertTrue(list_comparison(simple_list - custom_list,
                                         CustomList([-1, -1, 14, -3])))
 
