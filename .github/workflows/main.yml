@@ -1,6 +1,9 @@
 name: CI
 
-on: [push]
+on:
+  push:
+    paths:
+      - "07/**"
 
 jobs:
   run_tests:
