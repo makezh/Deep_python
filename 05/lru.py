@@ -13,11 +13,13 @@ class LRUCache:
         return None
 
     def set(self, key, value):
-        if len(self.cache) >= self.limit:
+        if len(self.cache) >= self.limit and \
+                key not in self.order_dict.keys():
             early_key = min(self.order_dict.keys(),
                             key=lambda k: self.order_dict[k])
             self.order_dict.pop(early_key)
             self.cache.pop(early_key)
+
         self.order_dict[key] = self.order
         self.order += 1
         self.cache[key] = value
@@ -30,15 +32,31 @@ def main():
         cache.set("k1", "val1")
         cache.set("k2", "val2")
 
-        print(cache.get("k3"))  # None
-        print(cache.get("k2"))  # "val2"
-        print(cache.get("k1"))  # "val1"
+        # val1 val2 None
+        for i in range(1, 4):
+            print(f"k{i} = {cache.get('k' + str(i))}")
+        print()
 
-        cache.set("k3", "val3")
+        cache.set("k2", "val22")
+        cache.set("k2", "val23")
+        cache.set("k2", "val24")
+        cache.set("k2", "val25")
+        cache.set("k1", "val11")
+        cache.set("k1", "val12")
+        cache.set("k1", "val123")
 
-        print(cache.get("k3"))  # "val3"
-        print(cache.get("k2"))  # None
-        print(cache.get("k1"))  # "val1"
+        # val123 val25 None
+        for i in range(1, 4):
+            print(f"k{i} = {cache.get('k' + str(i))}")
+        print()
+
+        cache.set("k3", "val321")
+
+        # None val25 321
+        for i in range(1, 4):
+            print(f"k{i} = {cache.get('k' + str(i))}")
+        print()
+
         return "alright, this is main"
     return "just end"
 
