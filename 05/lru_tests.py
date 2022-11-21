@@ -64,6 +64,18 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(cache.get("k2"), None)
         self.assertEqual(cache.get("k1"), "val14")
 
+    def test_order(self):
+        cache = LRUCache(2)
+        cache.set("k1", "val1")
+        cache.set("k2", "val2")
+
+        cache.set("k1", "val11")
+        cache.set("k3", "val3")
+
+        self.assertEqual(cache.get("k1"), "val11")
+        self.assertEqual(cache.get("k2"), None)
+        self.assertEqual(cache.get("k3"), "val3")
+
     def test_single_cache_size(self):
         cache = LRUCache(1)
 
