@@ -59,26 +59,32 @@ async def gather_data(file: str, num_workers: int = 5):
 
 
 def main():
-    time_start = time.time()
-    if len(sys.argv[1:]) == 2:
-        filename, workers = sys.argv[1], int(sys.argv[2])
-    else:
-        filename, workers = "urls.txt", 1
+    if __name__ == "__main__":
+        time_start = time.time()
+        if len(sys.argv[1:]) == 2:
+            filename, workers = sys.argv[1], int(sys.argv[2])
+        else:
+            filename, workers = "urls.txt", 20
+            # по-хорошему тут нужен 1 воркер,
+            # но поставил 10 для ускорения работы без аргументов
 
-    asyncio.run(gather_data(filename, workers))
+        asyncio.run(gather_data(filename, workers))
 
-    time_end = time.time()
+        time_end = time.time()
 
-    print(f"[TIME] {time_end - time_start} sec.")
+        print(f"[TIME] {time_end - time_start} sec.")
 
-    file_result = "parsing_result.json"
+        file_result = "parsing_result.json"
 
-    with open(file_result, "w", encoding="utf-8") as file:
-        json.dump(result, file, indent=4, ensure_ascii=False)
+        with open(file_result, "w", encoding="utf-8") as file:
+            json.dump(result, file, indent=4, ensure_ascii=False)
 
-    print(f"[FILE] The data is written to {file_result}")
-    print("[END] bye 🖐")
+        print(f"[FILE] The data is written to {file_result}")
+        print("[END] bye 🖐")
+
+        return "alright, this is main"
+
+    return "just end"
 
 
-if __name__ == "__main__":
-    main()
+main()
