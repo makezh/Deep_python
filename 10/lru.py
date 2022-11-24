@@ -61,13 +61,13 @@ class LRUCache:
 
     def get(self, key):
         if key in self.cache:
-            self.logger.info(f"Вызван get для существующего ключа - {key}")
+            self.logger.info("Вызван get для существующего ключа - '%s'", key)
             self.order_dict[key] = self.order
             self.order += 1
-            self.logger.debug(f"Завершение get('{key}')")
+            self.logger.debug("Завершение get('%s')", key)
             return self.cache[key]
-        self.logger.warning(f"Вызван get для несуществующего ключа - {key}")
-        self.logger.debug(f"Завершение get('{key}')")
+        self.logger.warning("Вызван get для несуществующего ключа - '%s'", key)
+        self.logger.debug("Завершение get('%s')", key)
         return None
 
     def set(self, key, value):
@@ -80,21 +80,24 @@ class LRUCache:
                             key=lambda k: self.order_dict[k])
             self.order_dict.pop(early_key)
             self.cache.pop(early_key)
-            self.logger.warning(f"Переполнение! Удален ключ - {early_key}")
+            self.logger.warning("Переполнение! Удален ключ - '%s'", early_key)
 
         elif key not in self.order_dict.keys():
-            self.logger.info(f"Добавление! Новый ключ - {key}")
+            self.logger.info("Добавление! Новый ключ - '%s'", key)
         else:
-            self.logger.info(f"Изменение! Существующий ключ - {key}")
+            self.logger.info("Изменение! Существующий ключ - '%s'", key)
 
         self.order_dict[key] = self.order
         self.order += 1
         self.cache[key] = value
-        self.logger.debug(f"Завершение set{key, value}")
+        self.logger.debug("Завершение set('%s', '%s')", key, value)
 
 
 def main():
-    cache = LRUCache(2, True)
+    if len(sys.argv) > 1 and sys.argv[1] == "-s":
+        cache = LRUCache(2, True)
+    else:
+        cache = LRUCache(2)
 
     cache.set("k1", "val1")
     cache.set("k2", "val2")
